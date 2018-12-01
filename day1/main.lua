@@ -3,7 +3,7 @@ package.path = package.path .. ";../?.lua"
 helpers = require "helpers"
 
 -- load input
-local file = 'input-rob.txt'
+local file = 'input.txt'
 local lines = helpers.lines_from(file)
 
 function part1()
