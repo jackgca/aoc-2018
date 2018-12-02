@@ -53,7 +53,7 @@ function part2()
 end
 
 function run()
-    --helpers.analyze(part1)
+    helpers.analyze(part1)
     helpers.analyze(part2)
 end
 
