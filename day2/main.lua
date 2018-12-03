@@ -45,7 +45,7 @@ function part2()
                     break
                 end
                 if (i == string.len(v) and v ~= w) then
-                    return v .. " " .. w
+                    return v .. "\n" .. w
                 end
             end
         end
