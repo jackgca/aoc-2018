@@ -47,7 +47,44 @@ function part1()
 end
 
 function part2()
+    suit = {}
+    for k,v in pairs(lines) do
+        left = tonumber(string.match(v, "@(.*),")) 
+        top = tonumber(string.match(v, ",(.*):")) 
+        width = tonumber(string.match(v, ":(.*)x")) 
+        height = tonumber(string.match(v, "x(.*)")) 
+        for i=left,left + width - 1 do
+            for j=top,top + height - 1 do
+                if (not suit[i]) then
+                    suit[i] = {}
+                end
 
+                if (not suit[i][j]) then
+                    suit[i][j]  = 1
+                elseif (suit[i][j] == 1) then
+                    suit[i][j] = 2
+                end
+
+            end
+        end
+    end
+    for k,v in pairs(lines) do
+        left = tonumber(string.match(v, "@(.*),")) 
+        top = tonumber(string.match(v, ",(.*):")) 
+        width = tonumber(string.match(v, ":(.*)x"))  
+        height = tonumber(string.match(v, "x(.*)")) 
+        hastwo = false
+        for i=left,left + width - 1 do 
+            for j=top,top + height - 1 do
+                if (suit[i][j] == 2) then
+                    hastwo = true
+                end
+            end
+        end
+        if (not hastwo) then
+            return string.match(v, "#(.*)([0-9])")
+        end
+    end
 end
 
 function run()
