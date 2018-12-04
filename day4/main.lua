@@ -4,36 +4,67 @@ helpers = require "helpers"
 
 lines = helpers.lines_from("input.txt")
 
-function by_date_time(a, b)
-    print(a)
-    print(b)
-    print(string.sub(a, 7, 8))
-    print(string.sub(b, 7, 8))
+function month(a, b)
     if (tonumber(string.sub(a, 7, 8)) < tonumber(string.sub(b, 7, 8))) then
-        return a
+        return true
     elseif (tonumber(string.sub(a, 10, 11)) < tonumber(string.sub(b, 10, 11))) then
-        return a
+        return true
     elseif (tonumber(string.sub(a, 13, 14)) < tonumber(string.sub(b, 13, 14))) then
-        return a
+        return true
     elseif (tonumber(string.sub(a, 16, 17)) < tonumber(string.sub(b, 16, 17))) then
-        return a
-    else
-        return b
+        return true
     end
 end
 
 function part1()
-    for i,v in ipairs(lines) do
-        if (string.len(v) < 2) then
-            table.remove(lines, i)
+    guards = {}
+    current_guard = 0
+    guards_list = {}
+    table.sort(lines, date_time)
+    for i, v in pairs(lines) do
+        if (string.find(v, "#")) then
+            current_guard = string.match(v, "#(.*)b")
+            if (not guards[current_guard]) then
+                guards[current_guard] = {}
+                guards_list[#guards_list + 1] = current_guard
+            end
+        elseif (string.find(v, "falls")) then
+            minute = string.sub(v, 16, 17)
+            if (not guards[current_guard].time_sleep) then
+                guards[current_guard].time_asleep = 0
+            end
+            sleep_time = tonumber(string.sub(lines[i + 1], 16, 17)) - tonumber(minute)
+            guards[current_guard].time_asleep = guards[current_guard].time_asleep + sleep_time
         end
     end
-    table.sort(lines, by_date_time)
-    for i,v in pairs(lines) do
-        print(v)
+    most_asleep = 0
+    guard = 0
+    for i=1,#guards_list do
+        if (guards[guards_list[i]].time_asleep and guards[guards_list[i]].time_asleep > most_asleep) then
+            most_asleep = guards[guards_list[i]].time_asleep
+            guard = guards_list[i]
+        end
+    end
+    sleep = {}
+    current_guard = 0
+    for i, v in pairs(lines) do
+        current_guard = string.match(v, "#(.*)b")
+        if (string.find(v, "#" .. guard)) then
+            yes = true
+        else
+            yes = false
+        end
+        if (yes) then
+            if (
+            sleep[#sleep + 1] = {}
+
+        end
     end
 end
 
+function part2()
+
+end
 
 function run()
     helpers.analyze(part1)
