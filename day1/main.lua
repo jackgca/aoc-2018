@@ -3,14 +3,16 @@ package.path = package.path .. ";../?.lua"
 helpers = require "helpers"
 
 -- load input
-local file = 'input.txt'
+local file = 'thomas.txt'
 local lines = helpers.lines_from(file)
 
 function part1()
     local freq = 0
 
     for k,v in pairs(lines) do
-        freq = freq + tonumber(v)
+        if (type(v)== "number") then
+            freq = freq + tonumber(v)
+        end
     end
 
     return freq
@@ -22,7 +24,9 @@ function part2()
 
     while true do
         for k,v in pairs(lines) do
-            freq = freq + tonumber(v)
+            if (type(v) == "number") then
+                freq = freq + tonumber(v)
+            end
             if (freqs[freq]) then
                 return freq
             end
