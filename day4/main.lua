@@ -20,7 +20,7 @@ function part1()
     guards = {}
     current_guard = 0
     guards_list = {}
-    table.sort(lines, date_time)
+    table.sort(lines, month)
     for i, v in pairs(lines) do
         if (string.find(v, "#")) then
             current_guard = string.match(v, "#(.*)b")
@@ -53,11 +53,7 @@ function part1()
             yes = true
         else
             yes = false
-        end
-        if (yes) then
-            if (
-            sleep[#sleep + 1] = {}
-
+        
         end
     end
 end
