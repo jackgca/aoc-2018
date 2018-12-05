@@ -2,7 +2,7 @@
 package.path = package.path .. ";../?.lua"
 helpers = require "helpers"
 
-lines = helpesr.lines_from("example.txt")
+lines = helpers.lines_from("example.txt")
 
 function part1()
 
