@@ -47,7 +47,7 @@ function part1()
     time_asleep = 0
     
     for i=1,#guard_list do
-        if (guards[guard_list[i]].time_asleep > sleepiest) then
+        if (guards[guard_list[i]].time_asleep > time_asleep) then
             sleepiest = guard_list[i]
             time_asleep = guards[guard_list[i]].time_asleep
         end
@@ -58,13 +58,22 @@ function part1()
     for i=1,59 do
         sleep[i] = 0
     end
-    
+    sleepy_guard = false
     for i,v in pairs(lines) do
-        if (string.find(v, "#" .. sleepiest)) then
-            startminute = tonumber(string.sub(lines[i+1], 16, 17))
-            endminute = tonumber(string.sub(lines[i+2], 16, 17))
-            for j=startminute,endminute do
-                sleep[j] = sleep[j] + 1
+        if (string.find(v, "#")) then
+            if (string.find(v, "#" .. sleepiest)) then
+                sleepy_guard = true
+            else
+                sleepy_guard = false
+            end
+        end
+        if (sleepy_guard) then
+            if (string.find(v, "falls")) then
+                startminute = tonumber(string.sub(v, 16, 17))
+                endminute = tonumber(string.sub(lines[i + 1], 16, 17))
+                for j=startminute,endminute do
+                    sleep[j] = sleep[j] + 1
+                end
             end
         end
     end
