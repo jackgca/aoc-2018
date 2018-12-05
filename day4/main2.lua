@@ -55,7 +55,7 @@ function part1()
 
     sleep = {}
     
-    for i=1,59 do
+    for i=0,59 do
         sleep[i] = 0
     end
     sleepy_guard = false
@@ -80,7 +80,7 @@ function part1()
     most_minutes = 0
     the_minute = 0
     
-    for i=1,59 do
+    for i=0,59 do
         if (sleep[i] > most_minutes) then
             most_minutes = sleep[i]
             the_minute = i
@@ -91,7 +91,46 @@ function part1()
 end
 
 function part2()
+    table.sort(lines, datetime)
+    guards = {}
+    guard_id = 0
+    guards_list = {}
+    current_guard = 0
+    for i,v in pairs(lines) do
+        minute = tonumber(string.sub(v, 16, 17))
+        if (string.find(v, "#")) then
+            current_guard = string.match(v, "#(.*)b")
+            if (not guards_list[current_guard]) then
+                guards_list[current_guard] = {}
+                for i=0,59 do
+                    guards_list[current_guard][i] = 0
+                end
+            end
+        end
+        if (string.find(v, "falls")) then
+            minute_start = tonumber(string.sub(v, 16, 17))
+            minute_end = tonumber(string.sub(lines[i+1], 16, 17))
+            for j=minute_start,minute_end do
+                guards_list[current_guard][j] = guards_list[current_guard][j] + 1
+            end
+        end
+    end
 
+    guard_id = 0
+    sleepiest_minute = 0
+    most_minutes = 0
+    for i,v in pairs(guards_list) do
+        for j=0,59 do
+            if (guards_list[i][j] > most_minutes) then
+                most_minutes = guards_list[i][j]
+                sleepiest_minute = j
+                guard_id = i
+            end
+        end
+    end
+    print(sleepiest_minute)
+    print(guard_id)
+    return sleepiest_minute * guard_id
 end
 
 function run()
