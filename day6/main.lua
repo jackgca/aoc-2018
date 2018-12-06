@@ -11,7 +11,7 @@ function part1()
 
     coords = {}
     i = 1
-    for str in input:gmatch("([^|]+)") do
+    for str in input2:gmatch("([^|]+)") do
         coords[i] = {
             x = tonumber(str:match("(.*),")),
             y = tonumber(str:match(",(.*)"))
@@ -120,11 +120,58 @@ function part1()
 end
 
 function part2()
+    input = "67, 191|215, 237|130, 233|244, 61|93, 93|145, 351|254, 146|260, 278|177, 117|89, 291|313, 108|145, 161|143, 304|329, 139|153, 357|217, 156|139, 247|304, 63|202, 344|140, 302|233, 127|260, 251|235, 46|357, 336|302, 284|313, 260|135, 40|95, 57|227, 202|277, 126|163, 99|232, 271|130, 158|72, 289|89, 66|94, 111|210, 184|139, 58|99, 272|322, 148|209, 111|170, 244|230, 348|112, 200|287, 55|320, 270|53, 219|42, 52|313, 205|166, 259"
 
+    input2 = "1, 1|1, 6|8, 3|3, 4|5, 5|8, 9"
+
+    coords = {}
+    i = 1
+    for str in input:gmatch("([^|]+)") do
+        coords[i] = {
+            x = tonumber(str:match("(.*),")),
+            y = tonumber(str:match(",(.*)"))
+        }
+        i = i + 1
+    end
+
+    xmin = nil
+    ymin = nil
+    xmax = 0
+    ymax = 0
+
+    for i,v in pairs(coords) do
+        if (not xmin) then xmin = v.x end
+        if (not ymin) then ymin = v.y end
+        if (v.x < xmin) then xmin = v.x end
+        if (v.y < ymin) then ymin = v.y end
+        if (v.x > xmax) then xmax = v.x end
+        if (v.y > ymax) then ymax = v.y end
+    end
+
+    closest_coord = {}
+
+    function distance_to_point(x1, x2, y1, y2)
+        return math.abs(x2 - x1) + math.abs(y2 - y1)
+    end
+
+    square_count = 0
+    for j=xmin,xmax do
+        for k=ymin,ymax do
+            count = 0
+            for i,v in pairs(coords) do
+                count = count + distance_to_point(v.x, j, v.y, k)
+            end
+            if (count < 10000) then
+                square_count = square_count + 1
+            end
+        end
+    end
+    print(square_count)
 end
 
+
 function run()
-    helpers.analyze(part1)
+    --helpers.analyze(part1)
     helpers.analyze(part2)
 end
 
