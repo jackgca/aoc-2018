@@ -2,7 +2,7 @@
 package.path = package.path .. ";../?.lua"
 helpers = require "helpers"
 
-lines = helpers.lines_from("input.txt")
+lines = helpers.lines_from("test.txt")
 
 function part1()
     suit = {}
@@ -89,7 +89,7 @@ end
 
 function run()
     helpers.analyze(part1)
-    helpers.analyze(part2)
+    --helpers.analyze(part2)
 end
 
 run()
