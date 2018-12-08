@@ -2,11 +2,11 @@
 package.path = package.path .. ";../?.lua"
 helpers = require "helpers"
 
-lines = helpers.lines_from("input.txt")
+lines = helpers.lines_from("example.txt")
 
 function part1()
     points = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    points2 = "ABCDEF"
+    points = "ABCDEF"
     edges = {}
 
     for i,v in pairs(lines) do
@@ -61,6 +61,7 @@ end
 
 function part2()
     points = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    --points = "ABCDEF"
     edges = {}
 
     for i,v in pairs(lines) do
@@ -71,7 +72,7 @@ function part2()
 
     workers = {}
 
-    for i=1,5 do
+    for i=1,2 do
         workers[i] = {
             step = nil,
             time_left = nil
@@ -80,7 +81,7 @@ function part2()
 
     function remove_edges(e, letter)
         answer = answer .. letter
-        edges = true
+        still_edges = true
         function remove_edge()
             for i,v in pairs(e) do
                 if (letter == v:sub(1,1)) then
@@ -88,9 +89,9 @@ function part2()
                     return true
                 end
             end
-            edges = false
+            still_edges = false
         end
-        while edges do
+        while still_edges do
             remove_edge()
         end
         points = points:gsub(letter, "")
@@ -98,41 +99,61 @@ function part2()
     end
 
     steps_added = {}
-
+    
     function tick()
-        assign_work()
+        -- assign workers
         for i=1,#workers do
-            if (workers[i].step) then
-                workers[i].time_left = workers[i].time_left - 1
+            if (not workers[i].step) then
+                if (#steps_queue[1].blockers == 0) then
+                    workers[i].step = steps_queue[1].letter
+                    workers[i].time_left = 0 + steps_queue[1].letter:byte() - 64
+                    table.remove(steps_queue, 1)
+                end
             end
+        end
+
+        -- process workers
+        for i=1,#workers do
+
             if (workers[i].time_left == 0) then
+                for j,v in pairs(steps_queue) do
+                    if (#v.blockers > 0) then
+                        for x=1,#v.blockers do
+                            if (workers[i].step == v.blockers[x]) then
+                                table.remove(v.blockers, x)
+                            end
+                        end
+                    end
+                end
                 workers[i].step = nil
                 workers[i].time_left = nil
             end
+            if (workers[i].step) then
+                workers[i].time_left = workers[i].time_left - 1
+            end
+
         end
     end
 
     steps_queue = {}
     total_time = 0
 
-    function assign_work()
-        for j=1,#workers do
-            if (not workers[j].step) then
-                if (steps_queue[1]) then
-                    workers[j].step = steps_queue[1]
-                    time = 60 + (steps_queue[1]:byte() - 64)
-                    workers[j].time_left = time
-                    print("step " .. steps_queue[1] .. "  will take " .. time .. " seconds")
-                    print("assigned to worker " .. j)
-                    total_time = total_time + time
-                    table.remove(steps_queue, 1)
-                end
+    function blocked_by(letter)
+        blockers = {}
+        for i,v in pairs(lines) do
+            if (v:sub(37,37) == letter) then
+                table.insert(blockers, v:sub(6,6))
             end
         end
+        return blockers
     end
 
     function sort_graph(e)
         if (#points == 1) then
+            table.insert(steps_queue, {
+                letter = points,
+                blockers = {}
+            })
             return answer .. points
         end
         candidates = {}
@@ -149,10 +170,15 @@ function part2()
             end
         end
         table.sort(candidates)
+        list = ""
         for i=1,#candidates do
+            list = list .. candidates[i]
             if (not steps_added[candidates[i]]) then
                 steps_added[candidates[i]] = true
-                table.insert(steps_queue, candidates[i])
+                table.insert(steps_queue, {
+                    letter = candidates[i],
+                    blockers = blocked_by(candidates[i])
+                })
             end
         end
 
@@ -168,11 +194,13 @@ function part2()
         return false
     end
 
+
     sort_graph(edges)
-    assign_work()
+    tick()
 
     while still_work() do
         tick()
+        total_time = total_time + 1
     end
 
     return total_time
@@ -180,7 +208,7 @@ function part2()
 end
 
 function run()
-    helpers.analyze(part1)
+    --helpers.analyze(part1)
     helpers.analyze(part2)
 end
 
