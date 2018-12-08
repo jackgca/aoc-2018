@@ -2,11 +2,11 @@
 package.path = package.path .. ";../?.lua"
 helpers = require "helpers"
 
-lines = helpers.lines_from("example.txt")
+lines = helpers.lines_from("input.txt")
 
 function part1()
     points = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    points = "ABCDEF"
+    points2 = "ABCDEF"
     edges = {}
 
     for i,v in pairs(lines) do
@@ -61,7 +61,7 @@ end
 
 function part2()
     points = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    --points = "ABCDEF"
+    points2 = "ABCDEF"
     edges = {}
 
     for i,v in pairs(lines) do
@@ -72,7 +72,7 @@ function part2()
 
     workers = {}
 
-    for i=1,2 do
+    for i=1,5 do
         workers[i] = {
             step = nil,
             time_left = nil
@@ -99,21 +99,24 @@ function part2()
     end
 
     steps_added = {}
-    
-    function tick()
-        -- assign workers
+
+    function assign_work()
         for i=1,#workers do
             if (not workers[i].step) then
-                if (#steps_queue[1].blockers == 0) then
+                if (#steps_queue ~= 0 and #steps_queue[1].blockers == 0) then
                     workers[i].step = steps_queue[1].letter
-                    workers[i].time_left = 0 + steps_queue[1].letter:byte() - 64
+                    workers[i].time_left = 60 + steps_queue[1].letter:byte() - 64
                     table.remove(steps_queue, 1)
                 end
             end
         end
-
-        -- process workers
+    end
+    
+    function tick()
         for i=1,#workers do
+            if (workers[i].step) then
+                workers[i].time_left = workers[i].time_left - 1
+            end
 
             if (workers[i].time_left == 0) then
                 for j,v in pairs(steps_queue) do
@@ -127,11 +130,8 @@ function part2()
                 end
                 workers[i].step = nil
                 workers[i].time_left = nil
+                assign_work()
             end
-            if (workers[i].step) then
-                workers[i].time_left = workers[i].time_left - 1
-            end
-
         end
     end
 
@@ -141,6 +141,7 @@ function part2()
     function blocked_by(letter)
         blockers = {}
         for i,v in pairs(lines) do
+            -- print("#" .. i)
             if (v:sub(37,37) == letter) then
                 table.insert(blockers, v:sub(6,6))
             end
@@ -152,7 +153,7 @@ function part2()
         if (#points == 1) then
             table.insert(steps_queue, {
                 letter = points,
-                blockers = {}
+                blockers = blocked_by(points)
             })
             return answer .. points
         end
@@ -196,11 +197,12 @@ function part2()
 
 
     sort_graph(edges)
+    assign_work()
     tick()
 
     while still_work() do
-        tick()
         total_time = total_time + 1
+        tick()
     end
 
     return total_time
