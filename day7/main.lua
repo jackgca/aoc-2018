@@ -5,67 +5,59 @@ helpers = require "helpers"
 lines = helpers.lines_from("input.txt")
 
 function part1()
-    steps = lines
-    alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    alpha2 = "ABCDEF"
+    table.sort(lines, sort_by_2)
+    points = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    points2 = "ABCDEF"
+    edges = {}
 
-    alpha_list = {}
-
-    for i=1,#alpha do
-        alpha_list[i] = alpha:sub(i, i)
-    end
-
-    index_list = {}
-
-    function update_index()
-        for i=1,#alpha do
-            index_list[alpha_list[i]] = i
-        end
-    end
-
-    update_index()
-
-    table.sort(steps)
-
-    function sort_by_parent(index, l, r, par)
-        table.sort(par)
-        print("#")
-        temp = ""
-        for i,v in pairs(par) do
-            temp = temp .. i
-        end
-        print(temp)
-        table.insert(alpha_list, index_list[r], l)
-        table.remove(alpha_list, index_list[l] + 1)
-        for i=index,#alpha_list do
-            if (par[steps[i]:sub(6, 6)]) then
-                table.insert(alpha_list, index_list[r], steps[i]:sub(6, 6))
-                table.remove(alpha_list, index_list[l] + 1)
-            end
-        end
-        update_index()
-    end
-
-    parents = {}
-
-    for i,v in pairs(steps) do
-        left = v:sub(6, 6)
-        right = v:sub(37 ,37)
-        if (index_list[right] < index_list[left]) then
-            if (not parents[left]) then
-                parents[left] = {}
-            end
-            parents[left][right] = true
-            sort_by_parent(index_list[left], left, right, parents[left])
-        end
+    for i,v in pairs(lines) do
+        table.insert(edges, v:sub(6, 6) .. v:sub(37, 37))
     end
 
     answer = ""
-    for i,v in pairs(alpha_list) do
-        answer = answer .. v
+
+    function remove_edges(e, letter)
+        answer = answer .. letter
+        edges = true
+        function remove_edge()
+            for i,v in pairs(e) do
+                if (letter == v:sub(1,1)) then
+                    table.remove(e, i)
+                    return true
+                end
+            end
+            edges =  false
+        end
+        while edges do
+            remove_edge()
+        end
+        points = points:gsub(letter, "")
+        return e
     end
 
-    print(answer)
+    function sort_graph(e)
+        if (#points == 1) then
+            return answer .. points
+        end
+        candidates = {}
+        for i=1,#points do
+            found_incoming = false
+            for j,w in pairs(e) do
+                if (points:sub(i,i) == w:sub(2,2)) then
+                    found_incoming = true
+                    break
+                end
+            end
+            if (not found_incoming) then
+                table.insert(candidates, points:sub(i,i))
+            end
+        end
+        table.sort(candidates)
+        return sort_graph(remove_edges(e, candidates[1]))
+    end
+
+    print(sort_graph(edges))
+
 end
 
 function part2()
