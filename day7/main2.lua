@@ -2,59 +2,62 @@
 package.path = package.path .. ";../?.lua"
 helpers = require "helpers"
 
-lines = helpers.lines_from("example.txt")
-
-function sort_by_2(a, b)
-    return a:sub(37, 37) > b:sub(37, 37)
-end
+lines = helpers.lines_from("input.txt")
 
 function part1()
     table.sort(lines, sort_by_2)
     points = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    points = "ABCDEF"
+    points2 = "ABCDEF"
     edges = {}
+
     for i,v in pairs(lines) do
         table.insert(edges, v:sub(6, 6) .. v:sub(37, 37))
     end
-    
-    table.sort(edges, edge_sort)
 
-    answer = {}
-    answers = ""
-    letters = {}
-    -- find start
-    for i,v in pairs(edges) do
-        letters[v:sub(2,2)] = true
-    end
+    answer = ""
 
-    start = nil
-
-    for i=1,#points do
-        if (not letters[points:sub(i,i)]) then
-            start = points:sub(i,i)
-            break
+    function remove_edges(e, letter)
+        answer = answer .. letter
+        edges = true
+        function remove_edge()
+            for i,v in pairs(e) do
+                if (letter == v:sub(1,1)) then
+                    table.remove(e, i)
+                    return true
+                end
+            end
+            edges =  false
         end
+        while edges do
+            remove_edge()
+        end
+        points = points:gsub(letter, "")
+        return e
     end
 
-    print(start)
-
-    answer = {}
-    index = {}
-    for i,v in pairs(points) do
-        table.insert(answer, v)
-        table.insert(index, i, v)
+    function sort_graph(e)
+        if (#points == 1) then
+            return answer .. points
+        end
+        candidates = {}
+        for i=1,#points do
+            found_incoming = false
+            for j,w in pairs(e) do
+                if (points:sub(i,i) == w:sub(2,2)) then
+                    found_incoming = true
+                    break
+                end
+            end
+            if (not found_incoming) then
+                table.insert(candidates, points:sub(i,i))
+            end
+        end
+        table.sort(candidates)
+        return sort_graph(remove_edges(e, candidates[1]))
     end
 
-    for i,v in pairs(edges) do
-        left = v:sub(1,1)
-        right = v:sub(2,2)
-        if (index[right] < index[left]) then
-            table.insert(answer, index[right], left)
-            table.remove(answer, index[left] + 1)
-            table.insert(index, answer[right], )
-        
+    print(sort_graph(edges))
 
-    --print(answers)
 end
 
 function part2()
