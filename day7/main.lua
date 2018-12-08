@@ -113,6 +113,7 @@ function part2()
     end
     
     function tick()
+        total_time = total_time + 1
         for i=1,#workers do
             if (workers[i].step) then
                 workers[i].time_left = workers[i].time_left - 1
@@ -201,7 +202,6 @@ function part2()
     tick()
 
     while still_work() do
-        total_time = total_time + 1
         tick()
     end
 
